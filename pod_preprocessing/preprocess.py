@@ -33,15 +33,14 @@ class PodPreProcess:
         file_path = Path(path)
         file_stats = file_path.stat() #get statistic of the file
         result["file_path"] = path
-        print(file_stats)
         result["MB_size"] =  self.bytes_to_megabytes(file_stats.st_size)
         result["creation_time"] = self.unix_timestamp_to_datetime(file_stats.st_ctime)
         result["last_access_time"] = self.unix_timestamp_to_datetime(file_stats.st_atime)
         result["last_modification_time"] = self.unix_timestamp_to_datetime(file_stats.st_mtime)
 
         ##------  2 more fields needed letter for the unique id ------
-        result["inode"] = self.unix_timestamp_to_datetime(file_stats.st_mtime)
-        result["device_id"] = self.unix_timestamp_to_datetime(file_stats.st_dev)
+        result["inode"] = file_stats.st_ino
+        result["device_id"] = file_stats.st_dev
         return result
 
 
