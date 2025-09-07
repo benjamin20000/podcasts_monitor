@@ -10,13 +10,17 @@ class PodPreProcess:
         self.files = []
 
 
-    def read_files_from_dir(self):
+    def load_files_from_dir(self):
         load_dotenv()
         directory_path = os.getenv("podcasts_dir")
         for entry in os.listdir(directory_path):
             full_path = os.path.join(directory_path, entry)
             if os.path.isfile(full_path):
-                self.files.append(f"{directory_path}/{entry}")
+                file_name, file_format = os.path.splitext(f"{directory_path}/{entry}")
+                old_name = f"{file_name}{file_format}"
+                new_name = f"{directory_path}/file_number_{len(self.files)}{file_format}"
+                os.rename(old_name, new_name)
+                self.files.append(new_name)
 
 
     def rename_files(self):
@@ -37,7 +41,7 @@ class PodPreProcess:
         result["creation_time"] = self.unix_timestamp_to_datetime(file_stats.st_ctime)
         result["last_access_time"] = self.unix_timestamp_to_datetime(file_stats.st_atime)
         result["last_modification_time"] = self.unix_timestamp_to_datetime(file_stats.st_mtime)
-        print(result)
+        return result
 
 
     def unix_timestamp_to_datetime(self, unix_timestamp ):
