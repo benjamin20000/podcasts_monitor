@@ -2,6 +2,7 @@ from kafka import KafkaConsumer
 import json
 from dotenv import load_dotenv
 import os
+from processor import Processor
 
 
 class ConsumeMetaData:
@@ -16,11 +17,14 @@ class ConsumeMetaData:
             enable_auto_commit=True,
             group_id='my_consumer_group',
             value_deserializer=lambda x: json.loads(x.decode('utf-8')),
+            consumer_timeout_ms=5000
         )
 
     def consume(self):
+        processor = Processor()
         for message in self.consumer:
-            print(message)
+            processor.process(message.value)
+
 
 
 
