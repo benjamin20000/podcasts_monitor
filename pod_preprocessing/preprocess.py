@@ -16,6 +16,16 @@ class PodPreProcess:
             if os.path.isfile(full_path):
                 self.files.append(f"{directory_path}/{entry}")
 
+    def rename_files(self):
+        load_dotenv()
+        directory_path = os.getenv("podcasts_dir")
+        for file_inx in range(len(self.files)):
+            file_name, file_format = os.path.splitext(self.files[file_inx])
+            old_name = f"{file_name}{file_format}"
+            new_name = f"{directory_path}/file_number_{file_inx}{file_format}"
+            os.rename(old_name, new_name)
+
+
     def parse_file(self, path):
         result = {}
         file_path = Path(path)
