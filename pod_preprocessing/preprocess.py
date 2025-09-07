@@ -2,19 +2,22 @@ import os
 # from importlib.metadata import files
 from dotenv import load_dotenv
 from pathlib import Path
+from datetime import datetime
 
 
 class PodPreProcess:
     def __init__(self):
         self.files = []
 
-    def get_files_in_directory(self):
+
+    def read_files_from_dir(self):
         load_dotenv()
         directory_path = os.getenv("podcasts_dir")
         for entry in os.listdir(directory_path):
             full_path = os.path.join(directory_path, entry)
             if os.path.isfile(full_path):
                 self.files.append(f"{directory_path}/{entry}")
+
 
     def rename_files(self):
         load_dotenv()
@@ -30,11 +33,16 @@ class PodPreProcess:
         result = {}
         file_path = Path(path)
         file_stats = file_path.stat()
-
-        result["mb_size"] =  self.bytes_to_megabytes(file_stats.st_size)
+        result["MB_size"] =  self.bytes_to_megabytes(file_stats.st_size)
+        result["creation_time"] = self.unix_timestamp_to_datetime(file_stats.st_ctime)
+        result["last_access_time"] = self.unix_timestamp_to_datetime(file_stats.st_atime)
+        result["last_modification_time"] = self.unix_timestamp_to_datetime(file_stats.st_mtime)
         print(result)
 
-        print(file_stats.st_mode)
+
+    def unix_timestamp_to_datetime(self, unix_timestamp ):
+        return datetime.fromtimestamp(unix_timestamp).strftime('%Y-%m-%d %H:%M:%S')
+
 
     def bytes_to_megabytes(self, bytes_value):
         megabytes = bytes_value / (1024 * 1024)
