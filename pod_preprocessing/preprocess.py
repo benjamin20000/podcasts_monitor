@@ -22,12 +22,12 @@ class PodPreProcess:
         result = {}
         file_path = Path(path)
         file_stats = file_path.stat() #get statistic of the file
-        result["file_path"] = path
         result["MB_size"] =  self._bytes_to_megabytes(file_stats.st_size)
         result["creation_time"] = self._unix_timestamp_to_datetime(file_stats.st_ctime)
         result["last_access_time"] = self._unix_timestamp_to_datetime(file_stats.st_atime)
         result["last_modification_time"] = self._unix_timestamp_to_datetime(file_stats.st_mtime)
-
+        ##---- the *original* in the field name because later the file name will change
+        result["original_file_path"] = path
         ##------  2 more fields needed letter for the unique id ------
         result["inode"] = file_stats.st_ino
         result["device_id"] = file_stats.st_dev
