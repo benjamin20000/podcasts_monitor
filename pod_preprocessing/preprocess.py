@@ -9,7 +9,7 @@ class PodPreProcess:
         self.files = []
 
 
-    def load_files_from_dir(self):
+    def _load_files_from_dir(self):
         load_dotenv()
         directory_path = os.getenv("podcasts_dir")
         for entry in os.listdir(directory_path):
@@ -18,15 +18,15 @@ class PodPreProcess:
                 self.files.append(f"{directory_path}/{entry}")
 
 
-    def parse_file(self, path):
+    def _parse_file(self, path):
         result = {}
         file_path = Path(path)
         file_stats = file_path.stat() #get statistic of the file
         result["file_path"] = path
-        result["MB_size"] =  self.bytes_to_megabytes(file_stats.st_size)
-        result["creation_time"] = self.unix_timestamp_to_datetime(file_stats.st_ctime)
-        result["last_access_time"] = self.unix_timestamp_to_datetime(file_stats.st_atime)
-        result["last_modification_time"] = self.unix_timestamp_to_datetime(file_stats.st_mtime)
+        result["MB_size"] =  self._bytes_to_megabytes(file_stats.st_size)
+        result["creation_time"] = self._unix_timestamp_to_datetime(file_stats.st_ctime)
+        result["last_access_time"] = self._unix_timestamp_to_datetime(file_stats.st_atime)
+        result["last_modification_time"] = self._unix_timestamp_to_datetime(file_stats.st_mtime)
 
         ##------  2 more fields needed letter for the unique id ------
         result["inode"] = file_stats.st_ino
@@ -34,20 +34,20 @@ class PodPreProcess:
         return result
 
 
-    def unix_timestamp_to_datetime(self, unix_timestamp ):
+    def _unix_timestamp_to_datetime(self, unix_timestamp ):
         return datetime.fromtimestamp(unix_timestamp).strftime('%Y-%m-%d %H:%M:%S')
 
 
-    def bytes_to_megabytes(self, bytes_value):
+    def _bytes_to_megabytes(self, bytes_value):
         megabytes = bytes_value / (1024 * 1024)
         return megabytes
 
 
     def preprocess(self):
         kafka_producer = Producer()
-        self.load_files_from_dir()
+        self._load_files_from_dir()
         for file in self.files:
-            metadata = self.parse_file(file)
+            metadata = self._parse_file(file)
             kafka_producer.produce(metadata)
 
 
