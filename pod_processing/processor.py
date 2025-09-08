@@ -6,23 +6,33 @@ class Processor:
     def __init__(self):
         self.elastic_dal = ElasticDal()
 
-
+    ##rename the file with the unique_id
     def rename_file(self, unique_id, file_path):
         file_name, file_format = os.path.splitext(file_path)
         directory_path = os.getenv("podcasts_dir")
-        new_name = f"{directory_path}/{unique_id}{file_format}"
-        os.rename(file_path, new_name)
+        new_path = f"{directory_path}/{unique_id}{file_format}"
+        os.rename(file_path, new_path)
+        return new_path
 
     ## -- the combination of the device id with the inode number
     ## -- are uniquely identifying any file
-    def create_unique_id(self, message):
-        return f"{message["device_id"]}{message["inode"]}"
+    def create_unique_id(self, metadata):
+        return f"{metadata["device_id"]}{metadata["inode"]}"
 
 
-    def process(self, message):
-        unique_id = self.create_unique_id(message)
-        self.rename_file(unique_id, message["file_path"])
-        self.elastic_dal.insert_metadata_doc(message, unique_id)
+    ## with the new unique_id some updates are necessary
+    ## 1 the unique_id himself as a field
+    ## 2 the new file name/path
+    def update_metadata(self, unique_id, new_path, metadata):
+        metadata["unique_id"] = unique_id
+        metadata["current_path"] = new_path
+
+
+    def process(self, metadata):
+        unique_id = self.create_unique_id(metadata)
+        new_path = self.rename_file(unique_id, metadata["original_file_path"])
+        self.update_metadata(unique_id, new_path, metadata)
+        self.elastic_dal.insert_metadata_doc(metadata, unique_id)
 
 
 
