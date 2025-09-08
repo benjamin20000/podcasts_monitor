@@ -3,19 +3,26 @@ from dotenv import load_dotenv
 from pathlib import Path
 from datetime import datetime
 from kafka_producer import Producer
+from logger import Logger
+
 
 class PodPreProcess:
     def __init__(self):
         self.files = []
+        self.logger = Logger.get_logger()
 
 
     def _load_files_from_dir(self):
         load_dotenv()
         directory_path = os.getenv("podcasts_dir")
-        for entry in os.listdir(directory_path):
-            full_path = os.path.join(directory_path, entry)
-            if os.path.isfile(full_path):
-                self.files.append(f"{directory_path}/{entry}")
+        try:
+            for entry in os.listdir(directory_path):
+                full_path = os.path.join(directory_path, entry)
+                if os.path.isfile(full_path):
+                    self.files.append(f"{directory_path}/{entry}")
+            self.logger.info(f"the directory {directory_path} loaded successfully")
+        except Exception as e:
+            self.logger.error(f"error occurred when trying to insert load {directory_path} folder: {e}")
 
 
     def _parse_file(self, path):
@@ -36,7 +43,6 @@ class PodPreProcess:
         result["unique_id"] = None
         result["inode"] = file_stats.st_ino
         result["device_id"] = file_stats.st_dev
-
         return result
 
 
