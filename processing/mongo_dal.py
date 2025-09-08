@@ -15,7 +15,7 @@ class MongoDal:
         fs = GridFS(self.db)
         with open(file_path, 'rb') as f:
             try:
-                file_id = fs.put(f, filename=unique_id, content_type='audio/wav')
+                file_id = fs.put(f, filename=unique_id, _id=unique_id, content_type='audio/wav')
                 self.logger.info(f"file uploaded with with file id: {file_id}")
             except Exception as e:
                 print(f"error occurred when trying to insert file to mongo: {e}")
