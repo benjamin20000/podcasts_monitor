@@ -12,7 +12,10 @@ class Processor:
         file_name, file_format = os.path.splitext(file_path)
         directory_path = os.getenv("podcasts_dir")
         new_path = f"{directory_path}/{unique_id}{file_format}"
-        os.rename(file_path, new_path)
+        try:
+            os.rename(file_path, new_path)
+        except Exception as e:
+            print(f"error occurred when trying to rename {file_path} file: {e}")
         return new_path
 
     ## -- the combination of the device id with the inode number

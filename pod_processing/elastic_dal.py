@@ -8,5 +8,8 @@ class ElasticDal:
         self.index_name = "files_metadata"
 
     def insert_metadata_doc(self, doc, unique_id ):
-        response = self.es_client.index(index=self.index_name, id=unique_id, body=doc)
-        print(response)
+        try:
+            response = self.es_client.index(index=self.index_name, id=unique_id, body=doc)
+            print(response)
+        except Exception as e:
+            print(f"error occurred when trying to insert doc into elastic: {e}")
