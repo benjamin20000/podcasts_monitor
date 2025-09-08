@@ -8,24 +8,22 @@ class ElasticDal:
         self.es_client = Elasticsearch(elastic_uri)
         self.index_name = elastic_metadata_index
         self.logger = Logger.get_logger()
-        # self._create_index()
+        self._create_index()
 
 
-    ## creating the index with schema in es if not exits
+    ## creating the index with schema in es only if index not exits
     def _create_index(self):
         if self.es_client.indices.exists(index=self.index_name):
             return
         mapping = {
             "properties": {
                 "MB_size": {"type": "float"},
-                "creation_time": {"type": "date",
-                               "format": "yyyy-MM-dd HH:mm:ssXXX"},
-                "last_access_time": {"type": "date",
-                                  "format": "yyyy-MM-dd HH:mm:ssXXX"},
-                "last_modification_time": {"type": "date",
-                                     "format": "yyyy-MM-dd HH:mm:ssXXX"},
+                "creation_time": {"type": "date", "format": "yyyy-MM-dd HH:mm:ss"},
+                "last_access_time": {"type": "date", "format": "yyyy-MM-dd HH:mm:ss"},
+                "last_modification_time": {"type": "date", "format": "yyyy-MM-dd HH:mm:ss"},
                 "original_file_path": {"type": "text"},
-                "current_file_path": {"type": "text"}
+                "current_file_path": {"type": "text"},
+                "stt":{"type": "text"}
             }
         }
         self.es_client.indices.create(index=self.index_name, body={"mappings": mapping}, ignore=400)
@@ -42,5 +40,3 @@ class ElasticDal:
 
     def _delete_index(self):
         self.es_client.indices.delete(index=self.index_name, ignore_unavailable=True)
-
-
