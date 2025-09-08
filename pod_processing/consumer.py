@@ -3,13 +3,14 @@ import json
 from dotenv import load_dotenv
 import os
 from processor import Processor
-
+from logger import Logger
 
 class ConsumeMetadata:
     def __init__(self):
+        self.logger = Logger.get_logger()
         load_dotenv()
-        topic_name = 'pod_file_meta_data'
         kafka_uri = os.getenv("kafka_uri")
+        topic_name = 'pod_file_meta_data'
         self.consumer = KafkaConsumer(
             topic_name,
             bootstrap_servers=[kafka_uri],
@@ -23,6 +24,9 @@ class ConsumeMetadata:
     def consume(self):
         processor = Processor()
         for message in self.consumer:
+            self.logger.info(f"new message hase consume: {message.value}")
             processor.process(message.value)
+
+
 
 

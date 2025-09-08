@@ -2,6 +2,7 @@ from pymongo import MongoClient
 from gridfs import GridFS
 from dotenv import load_dotenv
 import os
+from logger import Logger
 
 
 class MongoDal:
@@ -10,13 +11,15 @@ class MongoDal:
         uri = os.getenv("mongo_uri")
         client = MongoClient(uri)
         self.db = client["podcasts"]
+        self.logger = Logger.get_logger()
 
 
     def insert_audio_file(self, file_path, unique_id):
         fs = GridFS(self.db)
         with open(file_path, 'rb') as f:
             try:
-                fs.put(f, filename=unique_id, content_type='audio/wav')
+                file_id = fs.put(f, filename=unique_id, content_type='audio/wav')
+                self.logger.info(f"file uploaded with with file id: {file_id}")
             except Exception as e:
                 print(f"error occurred when trying to insert file to mongo: {e}")
 

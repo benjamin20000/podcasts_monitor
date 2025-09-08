@@ -1,10 +1,13 @@
 import os
 from elastic_dal import ElasticDal
 from mongo_dal import MongoDal
+from logger import Logger
 class Processor:
     def __init__(self):
         self.elastic_dal = ElasticDal()
         self.mongo_dal = MongoDal()
+        self.logger = Logger.get_logger()
+
 
     ##rename the file with the unique_id
     def rename_file(self, unique_id, file_path):
@@ -13,7 +16,9 @@ class Processor:
         new_path = f"{directory_path}/{unique_id}{file_format}"
         try:
             os.rename(file_path, new_path)
+            self.logger.info(f"file {file_path} rename to {new_path}")
         except Exception as e:
+            self.logger.error(f"error occurred when trying to rename {file_path} file: {e}")
             print(f"error occurred when trying to rename {file_path} file: {e}")
         return new_path
 
