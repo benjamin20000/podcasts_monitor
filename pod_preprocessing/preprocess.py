@@ -26,11 +26,17 @@ class PodPreProcess:
         result["creation_time"] = self._unix_timestamp_to_datetime(file_stats.st_ctime)
         result["last_access_time"] = self._unix_timestamp_to_datetime(file_stats.st_atime)
         result["last_modification_time"] = self._unix_timestamp_to_datetime(file_stats.st_mtime)
-        ##---- the *original* in the field name because later the file name will change
+        ## 2 fields for path needed
+        ## 1. original path - not going to change
+        ## 2. for current file path - could change
         result["original_file_path"] = path
-        ##------  2 more fields needed letter for the unique id ------
+        result["current_file_path"] = path
+
+        ##------  3 more fields needed letter (next service) for the unique id ------
+        result["unique_id"] = None
         result["inode"] = file_stats.st_ino
         result["device_id"] = file_stats.st_dev
+
         return result
 
 
