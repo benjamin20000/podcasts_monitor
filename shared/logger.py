@@ -1,8 +1,8 @@
 import logging
 from elasticsearch import Elasticsearch
 from datetime import datetime
-from dotenv import load_dotenv
-import os
+from .config import elastic_uri
+
 
 class Logger:
     _logger = None
@@ -14,9 +14,7 @@ class Logger:
         logger = logging.getLogger(name)
         logger.setLevel(level)
         if not logger.handlers:
-            load_dotenv()
-            es_host = os.getenv("elastic_uri")
-            es = Elasticsearch(es_host)
+            es = Elasticsearch(elastic_uri)
             class ESHandler(logging.Handler):
                 def emit(self, record):
                     try:

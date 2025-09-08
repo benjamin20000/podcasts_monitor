@@ -1,15 +1,12 @@
 from pymongo import MongoClient
 from gridfs import GridFS
-from dotenv import load_dotenv
-import os
-from logger import Logger
+from shared.logger import Logger
+from shared.config import mongo_uri
 
 
 class MongoDal:
     def __init__(self):
-        load_dotenv()
-        uri = os.getenv("mongo_uri")
-        client = MongoClient(uri)
+        client = MongoClient(mongo_uri)
         self.db = client["podcasts"]
         self.logger = Logger.get_logger()
 

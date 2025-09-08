@@ -1,10 +1,9 @@
 import os
-from dotenv import load_dotenv
 from pathlib import Path
 from datetime import datetime
 from kafka_producer import Producer
-from logger import Logger
-
+from shared.logger import Logger
+from shared.config import directory_path
 
 class PodPreProcess:
     def __init__(self):
@@ -13,8 +12,6 @@ class PodPreProcess:
 
 
     def _load_files_from_dir(self):
-        load_dotenv()
-        directory_path = os.getenv("podcasts_dir")
         try:
             for entry in os.listdir(directory_path):
                 full_path = os.path.join(directory_path, entry)

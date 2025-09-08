@@ -1,13 +1,11 @@
 from elasticsearch import Elasticsearch
-from dotenv import load_dotenv
-import os
-from logger import Logger
+from shared.logger import Logger
+from shared.config import elastic_uri
+
 
 class ElasticDal:
     def __init__(self):
-        load_dotenv()
-        uri = os.getenv("elastic_uri")
-        self.es_client = Elasticsearch(uri)
+        self.es_client = Elasticsearch(elastic_uri)
         self.index_name = "files_metadata"
         self.logger = Logger.get_logger()
 

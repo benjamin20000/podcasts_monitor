@@ -1,6 +1,6 @@
 from kafka import KafkaProducer
 import json
-from logger import Logger
+from shared.logger import Logger
 
 class Producer:
     def __init__(self):

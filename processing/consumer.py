@@ -3,7 +3,7 @@ import json
 from dotenv import load_dotenv
 import os
 from processor import Processor
-from logger import Logger
+from shared.logger import Logger
 
 class ConsumeMetadata:
     def __init__(self):

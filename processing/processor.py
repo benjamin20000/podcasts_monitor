@@ -1,7 +1,7 @@
 import os
 from elastic_dal import ElasticDal
 from mongo_dal import MongoDal
-from logger import Logger
+from shared.logger import Logger
 class Processor:
     def __init__(self):
         self.elastic_dal = ElasticDal()
