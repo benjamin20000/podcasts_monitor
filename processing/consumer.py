@@ -26,6 +26,7 @@ class ConsumeMetadata:
         for message in self.consumer:
             self.logger.info(f"new message hase consume: {message.value}")
             processor.process(message.value)
+        self.consumer.close()
 
 
 
