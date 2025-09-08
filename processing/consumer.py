@@ -21,6 +21,7 @@ class ConsumeMetadata:
             consumer_timeout_ms=5000
         )
 
+
     def consume(self):
         processor = Processor()
         for message in self.consumer:
