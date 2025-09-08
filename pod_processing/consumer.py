@@ -5,7 +5,7 @@ import os
 from processor import Processor
 
 
-class ConsumeMetaData:
+class ConsumeMetadata:
     def __init__(self):
         load_dotenv()
         topic_name = 'pod_file_meta_data'
@@ -25,9 +25,4 @@ class ConsumeMetaData:
         for message in self.consumer:
             processor.process(message.value)
 
-
-
-
-a = ConsumeMetaData()
-a.consume()
 
