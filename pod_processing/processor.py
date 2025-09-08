@@ -1,5 +1,4 @@
 import os
-from dotenv import load_dotenv
 from elastic_dal import ElasticDal
 from mongo_dal import MongoDal
 class Processor:

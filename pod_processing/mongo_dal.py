@@ -1,11 +1,13 @@
 from pymongo import MongoClient
 from gridfs import GridFS
+from dotenv import load_dotenv
 import os
 
 
 class MongoDal:
     def __init__(self):
-        uri = "mongodb://localhost:27017/"
+        load_dotenv()
+        uri = os.getenv("mongo_uri")
         client = MongoClient(uri)
         self.db = client["podcasts"]
 

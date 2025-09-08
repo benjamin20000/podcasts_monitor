@@ -1,10 +1,13 @@
-from elasticsearch import Elasticsearch, helpers
-
+from elasticsearch import Elasticsearch
+from dotenv import load_dotenv
+import os
 
 
 class ElasticDal:
     def __init__(self):
-        self.es_client = Elasticsearch("http://localhost:9200")
+        load_dotenv()
+        uri = os.getenv("elastic_uri")
+        self.es_client = Elasticsearch(uri)
         self.index_name = "files_metadata"
 
     def insert_metadata_doc(self, doc, unique_id ):
