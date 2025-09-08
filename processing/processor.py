@@ -2,11 +2,14 @@ import os
 from elastic_dal import ElasticDal
 from mongo_dal import MongoDal
 from shared.logger import Logger
+import speech_recognition as sr
+
 class Processor:
     def __init__(self):
         self.elastic_dal = ElasticDal()
         self.mongo_dal = MongoDal()
         self.logger = Logger.get_logger()
+        self.sudio_recognize = sr.Recognizer()
 
 
     ##rename the file with the unique_id
@@ -22,6 +25,7 @@ class Processor:
             print(f"error occurred when trying to rename {file_path} file: {e}")
         return new_path
 
+
     ## -- the combination of the device id with the inode number
     ## -- are uniquely identifying any file
     def create_unique_id(self, metadata):
@@ -31,9 +35,19 @@ class Processor:
     ## with the new unique_id some updates are necessary
     ## 1. after we have unique_id we will save hime in the metadata
     ## 2. the new file name/path
+    ## 3. add field for the stt
     def update_metadata(self, unique_id, new_path, metadata):
         metadata["unique_id"] = unique_id
         metadata["current_path"] = new_path
+        metadata["stt"] = self.stt(new_path)
+
+
+    def stt(self, file_path):
+        audiofile = sr.AudioFile(file_path)
+        with audiofile as source:
+            audio = self.sudio_recognize.record(source)
+            text = self.sudio_recognize.recognize_google(audio)
+            return text
 
 
     def process(self, metadata):
