@@ -3,7 +3,7 @@ import json
 from shared.config import kafka_uri
 from shared.logger import Logger
 
-class ConsumeMetadata:
+class Consumer:
     def __init__(self, topic_name):
         self.logger = Logger.get_logger()
         self.consumer = KafkaConsumer(
