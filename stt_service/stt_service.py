@@ -4,6 +4,7 @@ from shared.mongo_dal import MongoDal
 from shared.config import temp_folder_path
 import os
 
+
 class SttService:
     def __init__(self):
         self.audio_recognize = sr.Recognizer()
@@ -20,7 +21,7 @@ class SttService:
             self.logger.info(f"file {file_temp_path} has been temporarily downloaded")
             return file_temp_path
         except Exception as e:
-            self.logger.info(f"error occurred when trying to download audio file {e}")
+            self.logger.info(f"error occurred when trying to download audio file: {e}")
 
 
     def stt_logic(self, file_path, file_id):
@@ -35,8 +36,16 @@ class SttService:
             self.logger.error(f"file {file_id} convertion to text hase been failed")
 
 
+    def remove_file(self, temp_file_path):
+        try:
+            os.remove(temp_file_path)
+            self.logger.info(f"file {temp_file_path} has been removed successfully")
+        except Exception as e:
+            self.logger.error(f"error occurred when trying to remove file: {e}")
+
+
     def stt(self, file_id):
         temp_file_path = self.download_audio(file_id)
         text = self.stt_logic(temp_file_path, file_id)
-        os.remove(temp_file_path)
+        self.remove_file(temp_file_path)
         return text
