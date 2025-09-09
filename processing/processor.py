@@ -6,6 +6,7 @@ import speech_recognition as sr
 from shared.kafka_producer import Producer
 from shared.config import stt_kafka_topic
 
+
 class Processor:
     def __init__(self):
         self.elastic_dal = ElasticDal()
@@ -58,6 +59,7 @@ class Processor:
         self.update_metadata(unique_id, new_path, metadata)
         self.elastic_dal.insert_metadata_doc(metadata, unique_id)
         self.mongo_dal.upload_file(new_path, unique_id)
+        self.req_stt_service(unique_id)
 
 
 
