@@ -27,7 +27,7 @@ class MongoDal:
     def load_file(self, file_id):
         try:
             file = self.fs.get(file_id).read()
-            self.logger.info(f"file {file_id} hase benn load from mongo")
+            self.logger.info(f"file {file_id} hase been load from mongo")
             return file
         except Exception as e:
             self.logger.error(f"error occurred when trying to load the file from mongo: {e}")
