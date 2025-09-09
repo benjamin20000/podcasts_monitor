@@ -49,7 +49,7 @@ class Processor:
 
     ## use kafka for producing a request of a stt service
     def req_stt_service(self, unique_id):
-        req = {"unique_id": unique_id}
+        req = {"file_id": unique_id}
         self.kafka_producer.produce(req, stt_kafka_topic)
 
 
