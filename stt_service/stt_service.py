@@ -2,6 +2,7 @@ import speech_recognition as sr
 from shared.logger import Logger
 from shared.mongo_dal import MongoDal
 from shared.config import temp_folder_path
+from shared.elastic_dal import ElasticDal
 import os
 
 
@@ -10,6 +11,7 @@ class SttService:
         self.audio_recognize = sr.Recognizer()
         self.logger = Logger.get_logger()
         self.mongo_dal = MongoDal()
+        self.elastic_dal = ElasticDal()
 
 
     def download_audio(self, file_id):
@@ -44,8 +46,20 @@ class SttService:
             self.logger.error(f"error occurred when trying to remove file: {e}")
 
 
+    ## -- update the metadata in elastic using elastic dal
+    ## -- with the new stt text
+    def update_metadata(self, doc_id, text):
+        update_body = {
+            "doc": {
+                "stt": text
+            }
+        }
+        self.elastic_dal.update_doc(doc_id, update_body)
+
+
     def stt(self, file_id):
         temp_file_path = self.download_audio(file_id)
         text = self.stt_logic(temp_file_path, file_id)
         self.remove_file(temp_file_path)
-        return text
+        self.update_metadata(file_id, text)
+        # return text
