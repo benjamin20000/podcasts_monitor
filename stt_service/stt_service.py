@@ -1,0 +1,37 @@
+import speech_recognition as sr
+from shared.logger import Logger
+from shared.mongo_dal import MongoDal
+from shared.config import temp_folder_path
+
+
+class SttService:
+    def __init__(self):
+        self.audio_recognize = sr.Recognizer()
+        self.logger = Logger.get_logger()
+        self.mongo_dal = MongoDal()
+
+
+    def download_audio(self, file_id):
+        audio_bytes = self.mongo_dal.load_file(file_id)
+        file_temp_path = f"{temp_folder_path}{file_id}.wav"
+        with open(file_temp_path, "wb") as file:
+            file.write(audio_bytes)
+        return file_temp_path
+
+
+    def stt_logic(self, file_path, file_id):
+        try:
+            audiofile = sr.AudioFile(file_path)
+            with audiofile as source:
+                audio = self.audio_recognize.record(source)
+                text = self.audio_recognize.recognize_google(audio)
+                self.logger.info(f"file {file_id} has been converted to text")
+                return text
+        except Exception as e:
+            self.logger.error(f"file {file_id} convertion to text hase been failed")
+
+
+    def stt(self, file_id):
+        temp_file_path = self.download_audio(file_id)
+        text = self.stt_logic(temp_file_path, file_id)
+        print(text)
