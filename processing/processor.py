@@ -53,7 +53,8 @@ class Processor:
                 text = self.sudio_recognize.recognize_google(audio)
                 self.logger.info(f"file {file_path} hase been convert to text")
                 return text
-        except Exception:
+        except Exception as e:
+            self.logger.error(f"file {file_path} convertion to text hase been failed")
 
 
 
