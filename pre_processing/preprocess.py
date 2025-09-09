@@ -26,7 +26,7 @@ class PodPreProcess:
         result = {}
         file_path = Path(path)
         file_stats = file_path.stat() #get statistic of the file
-        result["MB_size"] =  self._bytes_to_megabytes(file_stats.st_size)
+        result["bytes_size"] =  file_stats.st_size
         result["creation_time"] = self._unix_timestamp_to_datetime(file_stats.st_ctime)
         result["last_access_time"] = self._unix_timestamp_to_datetime(file_stats.st_atime)
         result["last_modification_time"] = self._unix_timestamp_to_datetime(file_stats.st_mtime)
@@ -45,11 +45,6 @@ class PodPreProcess:
 
     def _unix_timestamp_to_datetime(self, unix_timestamp ):
         return datetime.fromtimestamp(unix_timestamp).strftime('%Y-%m-%d %H:%M:%S')
-
-
-    def _bytes_to_megabytes(self, bytes_value):
-        megabytes = bytes_value / (1024 * 1024)
-        return megabytes
 
 
     def preprocess(self):
