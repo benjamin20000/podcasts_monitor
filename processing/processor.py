@@ -1,8 +1,10 @@
 import os
-from elastic_dal import ElasticDal
+from shared.elastic_dal import ElasticDal
 from shared.mongo_dal import MongoDal
 from shared.logger import Logger
 import speech_recognition as sr
+from shared.kafka_producer import Producer
+from shared.config import stt_kafka_topic
 
 class Processor:
     def __init__(self):
@@ -10,6 +12,7 @@ class Processor:
         self.mongo_dal = MongoDal()
         self.logger = Logger.get_logger()
         self.sudio_recognize = sr.Recognizer()
+        self.kafka_producer = Producer()
 
 
     ##rename the file with the unique_id
@@ -41,6 +44,12 @@ class Processor:
         metadata["current_path"] = new_path
         del metadata["inode"]
         del metadata["device_id"]
+
+
+    ## use kafka for producing a request of a stt service
+    def req_stt_service(self, unique_id):
+        req = {"unique_id": unique_id}
+        self.kafka_producer.produce(req, stt_kafka_topic)
 
 
     def process(self, metadata):
