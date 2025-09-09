@@ -23,7 +23,7 @@ class ElasticDal:
                 "last_modification_time": {"type": "date", "format": "yyyy-MM-dd HH:mm:ss"},
                 "original_file_path": {"type": "text"},
                 "current_file_path": {"type": "text"},
-                "stt":{"type": "text"}
+                "pod_text":{"type": "text"}
             }
         }
         self.es_client.indices.create(index=self.index_name, body={"mappings": mapping}, ignore=400)
@@ -50,7 +50,3 @@ class ElasticDal:
     def _delete_index(self):
         self.es_client.indices.delete(index=self.index_name, ignore_unavailable=True)
 
-
-
-# e = ElasticDal()
-# e._delete_index()
