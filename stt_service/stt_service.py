@@ -2,7 +2,7 @@ import speech_recognition as sr
 from shared.logger import Logger
 from shared.mongo_dal import MongoDal
 from shared.config import temp_folder_path
-
+import os
 
 class SttService:
     def __init__(self):
@@ -12,11 +12,15 @@ class SttService:
 
 
     def download_audio(self, file_id):
-        audio_bytes = self.mongo_dal.load_file(file_id)
-        file_temp_path = f"{temp_folder_path}{file_id}.wav"
-        with open(file_temp_path, "wb") as file:
-            file.write(audio_bytes)
-        return file_temp_path
+        try:
+            audio_bytes = self.mongo_dal.load_file(file_id)
+            file_temp_path = f"{temp_folder_path}{file_id}.wav"
+            with open(file_temp_path, "wb") as file:
+                file.write(audio_bytes)
+            self.logger.info(f"file {file_temp_path} has been temporarily downloaded")
+            return file_temp_path
+        except Exception as e:
+            self.logger.info(f"error occurred when trying to download audio file {e}")
 
 
     def stt_logic(self, file_path, file_id):
@@ -34,4 +38,5 @@ class SttService:
     def stt(self, file_id):
         temp_file_path = self.download_audio(file_id)
         text = self.stt_logic(temp_file_path, file_id)
-        print(text)
+        os.remove(temp_file_path)
+        return text
