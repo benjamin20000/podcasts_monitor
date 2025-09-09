@@ -57,9 +57,9 @@ class SttService:
         self.elastic_dal.update_doc(doc_id, update_body)
 
 
-    def stt(self, file_id):
+    def process_stt(self, message):
+        file_id = message["file_id"]
         temp_file_path = self.download_audio(file_id)
         text = self.stt_logic(temp_file_path, file_id)
         self.remove_file(temp_file_path)
         self.update_metadata(file_id, text)
-        # return text
