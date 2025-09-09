@@ -38,5 +38,12 @@ class ElasticDal:
             self.logger.error(f"error occurred when trying to insert doc into elastic: {e}")
             print(f"error occurred when trying to insert doc into elastic: {e}")
 
+    def update_doc(self, doc_id, update_body):
+        try:
+            response = self.es_client.update(index=self.index_name, id=doc_id, body=update_body)
+            self.logger.info(f"elastic doc hase been updated with response: {response}")
+        except Exception as e:
+            self.logger.error(f"error occurred when trying to update a doc: {e}")
+
     def _delete_index(self):
         self.es_client.indices.delete(index=self.index_name, ignore_unavailable=True)
