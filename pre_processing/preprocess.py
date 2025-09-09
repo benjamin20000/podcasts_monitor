@@ -1,9 +1,9 @@
 import os
 from pathlib import Path
 from datetime import datetime
-from kafka_producer import Producer
+from shared.kafka_producer import Producer
 from shared.logger import Logger
-from shared.config import directory_path
+from shared.config import directory_path, processing_kafka_topic
 
 class PodPreProcess:
     def __init__(self):
@@ -52,7 +52,7 @@ class PodPreProcess:
         self._load_files_from_dir()
         for file in self.files:
             metadata = self._parse_file(file)
-            kafka_producer.produce(metadata)
+            kafka_producer.produce(metadata, processing_kafka_topic)
 
 
 
