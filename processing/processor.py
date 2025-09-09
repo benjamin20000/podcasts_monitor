@@ -34,28 +34,13 @@ class Processor:
 
     ## with the new unique_id some updates are necessary
     ## 1. after we have unique_id we will save hime in the metadata
-    ## 2. delete the inode and device id unnecessary fields
     ## 2. the new file name/path
-    ## 3. add field for the stt
+    ## 3. delete the inode and device id unnecessary fields
     def update_metadata(self, unique_id, new_path, metadata):
         metadata["unique_id"] = unique_id
         metadata["current_path"] = new_path
         del metadata["inode"]
         del metadata["device_id"]
-        metadata["stt"] = self.stt(new_path)
-
-
-    def stt(self, file_path):
-        try:
-            audiofile = sr.AudioFile(file_path)
-            with audiofile as source:
-                audio = self.sudio_recognize.record(source)
-                text = self.sudio_recognize.recognize_google(audio)
-                self.logger.info(f"file {file_path} hase been convert to text")
-                return text
-        except Exception as e:
-            self.logger.error(f"file {file_path} convertion to text hase been failed")
-
 
 
     def process(self, metadata):
