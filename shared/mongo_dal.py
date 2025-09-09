@@ -13,7 +13,6 @@ class MongoDal:
         self.fs = GridFS(self.db)
 
 
-
     def upload_file(self, file_path, unique_id):
         with open(file_path, 'rb') as f:
             try:
@@ -24,13 +23,14 @@ class MongoDal:
             except Exception as e:
                 self.logger.error(f"error occurred when trying to insert file to mongo: {e}")
 
-    def download_file(self, file_id):
+
+    def load_file(self, file_id):
         try:
             file = self.fs.get(file_id).read()
-            self.logger.info(f"file {file_id} hase benn download frmo mongo")
+            self.logger.info(f"file {file_id} hase benn load from mongo")
             return file
         except Exception as e:
-            self.logger.error(f"error occurred when trying to download the file from mongo: {e}")
+            self.logger.error(f"error occurred when trying to load the file from mongo: {e}")
             return None
 
 

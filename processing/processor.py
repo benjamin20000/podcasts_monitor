@@ -1,6 +1,6 @@
 import os
 from elastic_dal import ElasticDal
-from mongo_dal import MongoDal
+from shared.mongo_dal import MongoDal
 from shared.logger import Logger
 import speech_recognition as sr
 
@@ -63,7 +63,7 @@ class Processor:
         new_path = self.rename_file(unique_id, metadata["original_file_path"])
         self.update_metadata(unique_id, new_path, metadata)
         self.elastic_dal.insert_metadata_doc(metadata, unique_id)
-        self.mongo_dal.insert_audio_file(new_path, unique_id)
+        self.mongo_dal.upload_file(new_path, unique_id)
 
 
 
