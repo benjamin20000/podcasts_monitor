@@ -14,17 +14,25 @@ class MongoDal:
 
 
 
-    def insert_audio_file(self, file_path, unique_id):
+    def upload_file(self, file_path, unique_id):
         with open(file_path, 'rb') as f:
             try:
                 file_id = self.fs.put(f, filename=unique_id, _id=unique_id, content_type='audio/wav')
                 self.logger.info(f"file uploaded with with file id: {file_id}")
             except FileExists:
-                print(f"the file {file_path} already uploaded into mongodb")
                 self.logger.error(f"the file {file_path} already uploaded into mongodb")
             except Exception as e:
-                print(f"error occurred when trying to insert file to mongo: {e}")
                 self.logger.error(f"error occurred when trying to insert file to mongo: {e}")
+
+    def download_file(self, file_id):
+        try:
+            file = self.fs.get(file_id).read()
+            self.logger.info(f"file {file_id} hase benn download frmo mongo")
+            return file
+        except Exception as e:
+            self.logger.error(f"error occurred when trying to download the file from mongo: {e}")
+            return None
+
 
 
 
