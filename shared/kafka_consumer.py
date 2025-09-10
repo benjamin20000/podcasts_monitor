@@ -26,7 +26,7 @@ class Consumer:
             return consumer
         except NoBrokersAvailable as e:
             self.logger.error(f"failed to connect to Kafka brokers: {e}")
-            raise NoBrokersAvailable("no kafka brokers could be reached")
+            raise NoBrokersAvailable(f"failed to connect to Kafka brokers: {e}")
 
 
     ## consume func get a callback_function
