@@ -29,6 +29,11 @@ services:
     ports:
       - "9200:9200"
 
+  mongodb:
+    image: mongodb/mongodb-community-server:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
 
 
   pre_process:
@@ -43,6 +48,12 @@ services:
       data_path: "data"
 
   process:
+    image: process:1.0
+    depends_on:
+      - kafka
+      - es
+      - pre_process
+  S:
     image: process:1.0
     depends_on:
       - kafka
