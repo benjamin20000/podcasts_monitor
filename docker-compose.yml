@@ -1,0 +1,51 @@
+services:
+  kafka:
+    image: apache/kafka-native
+    container_name: kafka-1
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    environment:
+
+      KAFKA_LISTENERS: CONTROLLER://0.0.0.0:9091,PLAINTEXT://0.0.0.0:9092,DOCKER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,DOCKER://kafka:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,DOCKER:PLAINTEXT
+
+      # KRaft mode
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9091
+
+      # Use DOCKER for inter-broker comms
+      KAFKA_INTER_BROKER_LISTENER_NAME: DOCKER
+
+      # Single-node cluster
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  es:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
+    container_name: es
+    ports:
+      - "9200:9200"
+
+
+
+  pre_process:
+    image: pre_process:1.0
+    container_name: pre_process_container
+    depends_on:
+      - kafka
+      - es
+    environment:
+      kafka_uri: 'kafka:9093'
+      elastic_uri: 'es:9200'
+      data_path: "data"
+
+  process:
+    image: process:1.0
+    depends_on:
+      - kafka
+      - es
+      - pre_process
+
