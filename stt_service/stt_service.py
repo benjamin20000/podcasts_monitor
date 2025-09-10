@@ -1,8 +1,9 @@
 import speech_recognition as sr
 from shared.logger import Logger
 from shared.mongo_dal import MongoDal
-from shared.config import temp_folder_path
+from shared.config import temp_folder_path, bds_kafka_topic
 from shared.elastic_dal import ElasticDal
+from shared.kafka_producer import Producer
 import os
 
 
@@ -12,6 +13,7 @@ class SttService:
         self.logger = Logger.get_logger()
         self.mongo_dal = MongoDal()
         self.elastic_dal = ElasticDal()
+        self.kafka_producer = Producer()
 
 
     def download_audio(self, file_id):
@@ -59,10 +61,16 @@ class SttService:
         self.elastic_dal.update_doc(doc_id, update_body)
 
 
+    def produce_bds_detection(self, pod_id):
+        message = {"pod_id": pod_id}
+        self.kafka_producer.produce(message, bds_kafka_topic)
+
     def process_stt(self, message):
-        file_id = message["file_id"]
-        temp_file_path = self.download_audio(file_id)
-        text = self.stt_logic(temp_file_path, file_id)
+        pod_id = message["file_id"]
+        temp_file_path = self.download_audio(pod_id)
+        text = self.stt_logic(temp_file_path, pod_id)
         self.remove_file(temp_file_path)
         count_words = len(text.split())
-        self.update_metadata(file_id, text, count_words)
+        self.update_metadata(pod_id, text, count_words)
+        self.produce_bds_detection(pod_id)
+
