@@ -4,7 +4,7 @@ from shared.mongo_dal import MongoDal
 from shared.logger import Logger
 import speech_recognition as sr
 from shared.kafka_producer import Producer
-from shared.config import stt_kafka_topic
+from shared.config import stt_kafka_topic, pod_path
 
 
 class Processor:
@@ -19,7 +19,7 @@ class Processor:
     ##rename the file with the unique_id
     def rename_file(self, unique_id, file_path):
         file_name, file_format = os.path.splitext(file_path)
-        directory_path = os.getenv("podcasts_dir")
+        directory_path = pod_path
         new_path = f"{directory_path}/{unique_id}{file_format}"
         try:
             os.rename(file_path, new_path)

@@ -3,7 +3,7 @@ from pathlib import Path
 from datetime import datetime
 from shared.kafka_producer import Producer
 from shared.logger import Logger
-from shared.config import directory_path, processing_kafka_topic
+from shared.config import pod_path, processing_kafka_topic
 
 class PodPreProcess:
     def __init__(self):
@@ -13,13 +13,13 @@ class PodPreProcess:
 
     def _load_files_from_dir(self):
         try:
-            for entry in os.listdir(directory_path):
-                full_path = os.path.join(directory_path, entry)
+            for entry in os.listdir(pod_path):
+                full_path = os.path.join(pod_path, entry)
                 if os.path.isfile(full_path):
-                    self.files.append(f"{directory_path}/{entry}")
-            self.logger.info(f"the directory {directory_path} loaded successfully")
+                    self.files.append(f"{pod_path}/{entry}")
+            self.logger.info(f"the directory {pod_path} loaded successfully")
         except Exception as e:
-            self.logger.error(f"error occurred when trying to insert load {directory_path} folder: {e}")
+            self.logger.error(f"error occurred when trying to insert load {pod_path} folder: {e}")
 
 
     def _parse_file(self, path):
