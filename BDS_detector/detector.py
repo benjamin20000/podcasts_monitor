@@ -36,7 +36,7 @@ class Detector:
     # the logic of BDS scoring is to count the black and grey words,
     # when black word count as 1,
     # and grey word count as 1/2.
-    # then the counter result will divided by the amount of the podcast's words
+    # then the counter result will be divided by the amount of the podcast's words
     #-----------------------------------------------------
     # As for the is_bds threshold - in case of pod that have 2 or 3 hours of random talk
     # if this pod have 1 minute of BDS comment

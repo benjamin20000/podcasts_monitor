@@ -8,5 +8,6 @@ def main():
     processor = Processor()
     consumer.consume(processor.process)
 
+
 if __name__ == "__main__":
     main()

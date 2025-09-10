@@ -36,8 +36,7 @@ class PodPreProcess:
         result["original_file_path"] = path
         result["current_file_path"] = path
 
-        ##------  3 more fields needed letter (next service) for the unique id ------
-        result["unique_id"] = None
+        ##------  2 more fields needed latter (next service) for the unique id ------
         result["inode"] = file_stats.st_ino
         result["device_id"] = file_stats.st_dev
         return result

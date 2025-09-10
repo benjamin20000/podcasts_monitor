@@ -21,9 +21,6 @@ class ElasticDal:
             raise
 
 
-
-
-
     ## creating the index with schema in es only if index not exits
     ## this mapping needed especially for all date types
     ## to make sure es will not to save them as a string
