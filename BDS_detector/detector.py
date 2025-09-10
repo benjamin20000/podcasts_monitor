@@ -13,11 +13,10 @@ class Detector:
 
     def get_list(self, path):
         try:
-            list = []
             with open(path, "r") as file:
-                for line in file:
-                    decoded_line = base64.b64decode(line).decode('utf-8')
-                    list.append(decoded_line)
+                file = file.read()
+                decoded_file = base64.b64decode(file).decode('utf-8')
+                list =  decoded_file.split(",")
             self.logger.info(f"file {path} loaded and decoded successfully")
             return list
         except FileNotFoundError:
@@ -28,63 +27,75 @@ class Detector:
             raise Exception(f"error occurred during file loading {e}")
 
 
-
-    ## create script with the logic of bds fields
-    def get_es_script(self):
-        return {
-            "script": {
-                "lang": "painless",
-                "source": """
-                        ctx._source.bds_percent = 1
-                                              # List black_list = params.black_list;
-                                              # List grey_list = params.grey_list;                                           
-                                              # String text = ctx._source.pod_text.toLowerCase();
-                                              # float counter = 0;
-                                              # for (word in black_list) {
-                                              #     if (text.contains(word.toLowerCase())) {
-                                              #       counter +=1                                                      
-                                              #     }
-                                              # }
-                                              #  for (word in grey_list) {
-                                              #     if (text.contains(word.toLowerCase())) {
-                                              #       counter += 0.5                                                     
-                                              #     }
-                                              # }
-                                              # String[] words = text.split("\\s+"); 
-                                              # ctx._source.bds_percent = counter / words.length
-                                          """,
-                "params": {
-                    "black_list": self.black_list,
-                    "grey_list": self.grey_list
-                }
-            }
-        }
-
-
+    # TODO: use the capabilities of es to match words and score docs.
+    # for now i am making a painless script,
+    # that will run on es server/container,
+    # in order to reduce the use of this service resources,
+    # and to make this service faster
+    # ----------------------------------------------------
+    # the logic of BDS scoring is to count the black and grey words,
+    # when black word count as 1,
+    # and grey word count as 1/2.
+    # then the counter result will divided by the amount of the podcast's words
+    #-----------------------------------------------------
+    # As for the is_bds threshold - in case of pod that have 2 or 3 hours of random talk
+    # if this pod have 1 minute of BDS comment
+    # i still want to determine this pod as promoting BDS
+    # so the threshold going to be low - 4%  for now
+    #-----------------------------------------------------
+    # AS for the bds_threat_level:
+    # bds_percent < 3%  ==> none
+    # 3% < bds_percent =< 6%  ==> medium
+    # 6% < bds_percent  ==> high
     def detect(self, pod_id):
-        # body_script = self.get_es_script()
-
         body_script = {
             "script": {
                 "lang": "painless",
                 "source":
                     """
-                    String my_text_field = "aba"
-                    int wordCount = 0;
-                    wordCount = doc['my_text_field'].value.split(/\s+/).length;
-
-
+                    String suspicious_text = ctx._source.pod_text.toLowerCase();
+                    int word_amount = ctx._source.text_words_count;
+                    List black_list = params.black_list;
+                    List grey_list = params.grey_list;
+                    float counter = 0;
+                    for (word in black_list) {
+                        if (suspicious_text.contains(word.toLowerCase())) {
+                            counter += 1;                                                    
+                        }
+                    }
+                    for (word in grey_list) {
+                        if (suspicious_text.contains(word.toLowerCase())) {
+                            counter += 0.5;                                                    
+                        }
+                    }
+                    float bds_percent = 100 * counter / word_amount;
+                    if(bds_percent > params.bds_threshold){
+                        ctx._source.is_bds = true
+                    }
+                    else{
+                        ctx._source.is_bds = false
+                    }
+                    
+                    if(bds_percent < params.bds_medium_threshold){
+                        ctx._source.bds_threat_level = "none"
+                    }
+                    else if(bds_percent < params.bds_none_high){
+                            ctx._source.bds_threat_level = "medium"
+                        }
+                    else{
+                        ctx._source.bds_threat_level = "high"
+                    }        
                     """,
                 "params": {
-                    "text": "aba aba aima",
-                    "increment_by": 1,
                     "black_list": self.black_list,
-                    "grey_list": self.grey_list
-                }
+                    "grey_list": self.grey_list,
+                    "bds_threshold": 4,
+                    "bds_medium_threshold": 3,
+                    "bds_none_high": 6,
 
+                }
             }
         }
-
         self.es_dal.update_doc(pod_id, body_script)
 
 
