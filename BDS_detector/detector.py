@@ -47,7 +47,8 @@ class Detector:
     # bds_percent < 3%  ==> none
     # 3% < bds_percent =< 6%  ==> medium
     # 6% < bds_percent  ==> high
-    def detect(self, pod_id):
+    def detect(self, req):
+        pod_id = req["pod_id"]
         body_script = {
             "script": {
                 "lang": "painless",
