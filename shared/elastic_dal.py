@@ -12,6 +12,8 @@ class ElasticDal:
 
 
     ## creating the index with schema in es only if index not exits
+    ## this mapping needed especially for all date types
+    ## to make sure es will not to save them as a string
     def _create_index(self):
         if self.es_client.indices.exists(index=self.index_name):
             return
@@ -23,7 +25,7 @@ class ElasticDal:
                 "last_modification_time": {"type": "date", "format": "yyyy-MM-dd HH:mm:ss"},
                 "original_file_path": {"type": "text"},
                 "current_file_path": {"type": "text"},
-                "pod_text":{"type": "text"}
+                "pod_text":{"type": "text"},
             }
         }
         self.es_client.indices.create(index=self.index_name, body={"mappings": mapping}, ignore=400)
@@ -49,4 +51,5 @@ class ElasticDal:
 
     def _delete_index(self):
         self.es_client.indices.delete(index=self.index_name, ignore_unavailable=True)
+
 
