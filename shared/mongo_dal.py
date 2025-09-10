@@ -1,16 +1,29 @@
 from gridfs.errors import FileExists
-from pymongo import MongoClient
+from pymongo import MongoClient, errors
 from gridfs import GridFS
+from pymongo.errors import ServerSelectionTimeoutError
+
 from shared.logger import Logger
 from shared.config import mongo_uri
 
 
 class MongoDal:
     def __init__(self):
-        client = MongoClient(mongo_uri)
-        self.db = client["podcasts"]
         self.logger = Logger.get_logger()
+        client = self.create_connection()
+        self.db = client["podcasts"]
         self.fs = GridFS(self.db)
+
+
+    def create_connection(self):
+        try:
+            client = MongoClient(mongo_uri)
+            client.server_info()
+            self.logger.info(f"connection establish to mongo")
+            return client
+        except ServerSelectionTimeoutError as e:
+            self.logger.error(f"error occurred when trying to connect to mongo {e}")
+            raise ServerSelectionTimeoutError("No MongoDB servers found within the specified timeout.")
 
 
     def upload_file(self, file_path, unique_id):
