@@ -48,10 +48,12 @@ class SttService:
 
     ## -- update the metadata in elastic using elastic dal
     ## -- with the new stt text
-    def update_metadata(self, doc_id, text):
+    ## -- with the text words count - needed for other service
+    def update_metadata(self, doc_id, text, words_count):
         update_body = {
             "doc": {
-                "stt": text
+                "pod_text": text,
+                "text_words_count": words_count
             }
         }
         self.elastic_dal.update_doc(doc_id, update_body)
@@ -62,4 +64,5 @@ class SttService:
         temp_file_path = self.download_audio(file_id)
         text = self.stt_logic(temp_file_path, file_id)
         self.remove_file(temp_file_path)
-        self.update_metadata(file_id, text)
+        count_words = len(text.split())
+        self.update_metadata(file_id, text, count_words)
