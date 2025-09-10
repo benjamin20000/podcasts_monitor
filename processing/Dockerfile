@@ -1,0 +1,15 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY processing/ .
+
+COPY shared/ ./shared
+
+COPY data/ ./data
+
+CMD ["python3", "main.py"]
