@@ -5,10 +5,23 @@ from shared.config import elastic_uri, elastic_metadata_index
 
 class ElasticDal:
     def __init__(self):
-        self.es_client = Elasticsearch(elastic_uri)
-        self.index_name = elastic_metadata_index
         self.logger = Logger.get_logger()
+        self.es_client = self.create_connection()
+        self.index_name = elastic_metadata_index
         self._create_index()
+
+
+    def create_connection(self):
+        es_client = Elasticsearch(elastic_uri)
+        if es_client.ping():
+            self.logger.info(f"connection establish to es")
+            return es_client
+        else:
+            self.logger.error(f"cant connect to es")
+            raise
+
+
+
 
 
     ## creating the index with schema in es only if index not exits
